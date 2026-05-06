@@ -1,10 +1,4 @@
-/*
-  producer_consumer.c
-  Classic producer-consumer using a circular buffer of 5 chars and
-  condition variables. Producer reads characters from "message.txt"
-  one by one and writes them into the buffer. Consumer pulls them
-  out in order and prints them.
-*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>
@@ -12,9 +6,9 @@
 #define BUFFER_SIZE 5
 
 char buffer[BUFFER_SIZE];
-int in = 0;          /* next slot for producer */
-int out = 0;         /* next slot for consumer */
-int count = 0;       /* number of items currently in buffer */
+int in = 0;        //slots for producer
+int out = 0;        // slots for consumer
+int count = 0;      //number of itesm in buffer
 int producer_done = 0;
 
 pthread_mutex_t mutex   = PTHREAD_MUTEX_INITIALIZER;
@@ -44,7 +38,6 @@ void *producer(void *arg)
 
 	fclose(fp);
 
-	/* signal end of stream so consumer can drain and exit */
 	pthread_mutex_lock(&mutex);
 	producer_done = 1;
 	pthread_cond_signal(&not_empty);

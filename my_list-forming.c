@@ -1,29 +1,4 @@
-/*
-  my_list-forming.c
 
-  Optimized version of list-forming.c.
-
-  Two changes drive the speedup:
-
-  1) Each thread builds its own LOCAL list of K nodes without touching
-     any shared state. After the local list is complete it is spliced
-     onto the global list in a single critical section. Each thread
-     therefore acquires the mutex exactly once instead of K times,
-     which collapses lock-acquisition overhead and contention from
-     O(num_threads * K) down to O(num_threads).
-
-  2) The original program uses pthread_mutex_trylock inside a tight
-     while(1) loop. When a thread cannot acquire the lock it spins,
-     burning a CPU and starving the lock holder of cycles. We use
-     pthread_mutex_lock so a contending thread sleeps until the lock
-     is released; with O(num_threads) acquisitions instead of
-     O(num_threads * K) the wait path is barely exercised at all.
-
-  Compile:
-      gcc my_list-forming.c -o my_list-forming -lpthread -D_GNU_SOURCE
-  Run:
-      ./my_list-forming <num_threads>
-*/
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -32,7 +7,7 @@
 #include <sys/param.h>
 #include <sched.h>
 
-#define K 200 /* generate a data node K times in each thread */
+#define K 200 //Generating a node that goes k amount of times in each thread. 
 
 struct Node
 {
@@ -78,7 +53,6 @@ void *producer_thread(void *arg)
     struct Node *local_tail = NULL;
     int counter = 0;
 
-    /* build a local list of K nodes with no locking */
     while (counter < K) {
         struct Node *ptr = generate_data_node();
         if (NULL != ptr) {
@@ -93,7 +67,6 @@ void *producer_thread(void *arg)
         ++counter;
     }
 
-    /* splice the local list onto the global list in one critical section */
     if (local_head != NULL) {
         pthread_mutex_lock(&mutex_lock);
         if (List->header == NULL) {

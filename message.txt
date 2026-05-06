@@ -1,1 +1,1 @@
-Hello from the producer-consumer demo using condition variables!
+Hello Earth this is Johnny from mars

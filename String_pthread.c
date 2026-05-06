@@ -66,9 +66,9 @@ int readf(FILE *fp)
 	s1=fgets(s1, MAX, fp);
 	s2=fgets(s2, MAX, fp);
 	n1=strlen(s1);  /*length of s1*/
-	if(s1[n1-1] == '\n') n1--; /*strip newline from s1*/
+	if(s1[n1-1] == '\n') n1--; 
 	n2=strlen(s2);
-	if(s2[n2-1] == '\n') n2--; /*strip newline from s2*/
+	if(s2[n2-1] == '\n') n2--;
 	nlocal=n1/NUM_THREADS;  /*data length held by process*/
 	if(s1==NULL || s2==NULL ||n1<n2)  /*when error exit*/
 		return -1;
@@ -76,16 +76,14 @@ int readf(FILE *fp)
 	return 0;
 }
 
-void *sub_string(void *threadid) 	/*each thread searches its assigned chunk of s1*/
-	/*starting positions: tid*nlocal .. (tid+1)*nlocal - 1, capped at n1-n2*/
+void *sub_string(void *threadid)// each thread searches through chunks of s1
 {
 	long tid = (long)threadid;
 	int start = tid * nlocal;
-	int end   = start + nlocal - 1;     /*last starting index this thread owns*/
+	int end   = start + nlocal - 1;    
 	int local_count = 0;
 	int i, j, k, count;
 
-	/*the absolute last possible starting index for a match is n1 - n2*/
 	if (end > n1 - n2) end = n1 - n2;
 
 	for (i = start; i <= end; i++) {
@@ -102,7 +100,6 @@ void *sub_string(void *threadid) 	/*each thread searches its assigned chunk of s
 		}
 	}
 
-	/*add local count to global total under lock*/
 	pthread_mutex_lock(&total_lock);
 	total += local_count;
 	pthread_mutex_unlock(&total_lock);
